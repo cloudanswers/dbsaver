@@ -1,0 +1,56 @@
+extends layout.pug
+
+block content 
+  div(class="container pt-10")
+
+    if error
+      <div class="alert alert-warning d-flex align-items-center" role="alert">
+        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+        div=JSON.stringify(error)
+          
+      </div>
+
+    section.topic
+      h2 CloudAnswers Admin
+      p Welcome #{id ? id.first_name : "[IDENTITY FAILURE]"}
+
+    section(class="nes-container with-title")
+      h3.title backup progress
+      progress(value="90" max="100").nes-progress
+
+    //- sections collapse?
+    br
+
+    section
+        h3.title Actions
+        button.nes-btn.is-primary.is-disabled(type="submit" disabled) Backup Data
+        button.nes-btn.is-primary(type="button") Backup Metadata
+
+    section
+        h3.title Folders 
+        pre=connectionId
+        
+        for f in folders
+          section(class="topic")
+
+        table(class="table")
+          thead
+            tr
+              th(scope="col") #
+              th(scope="col") folder
+              th(scope="col") action
+              
+          tbody
+            each f, index in folders
+              tr
+                th(scope="row")=index
+                td=f
+                td
+                  a(href="/dashboard/" + f) open
+                  span.px-1 |
+                  a(href="/dashboard/" + f) download
+
+            
+          
+
+
