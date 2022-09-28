@@ -1,0 +1,27 @@
+{
+  "name": "dbsaver.com",
+  "version": "1.0.0",
+  "description": "open source salesforce backup",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cloudanswers/dbsaver.git"
+  },
+  "keywords": [
+    "salesforce",
+    "backup"
+  ],
+  "author": "James Sullivan / CloudAnswers",
+  "license": "AGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/cloudanswers/dbsaver/issues"
+  },
+  "homepage": "https://github.com/cloudanswers/dbsaver#readme",
+  "dependencies": {
+    "express": "^4.18.1",
+    "jsforce": "^1.11.0"
+  }
+}
