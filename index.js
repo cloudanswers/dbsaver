@@ -139,16 +139,13 @@ app.get("/dashboard/*", async (req, res) => {
   // we expect connection folders to end in slash
   if (connectionId && !connectionId.endsWith("/")) connectionId += "/";
   if (!connectionId) return res.status(404).send("no connection");
-  if (!req.session.id) return res.render("admin/login");
+  if (!req.session?.id) return res.redirect("/");
   if (
-    // customer's org
     req.session.id &&
     req.session.id.length >= 15 &&
-    !connectionId.includes(req.session.id) &&
-    // our internal org
-    !req.session.id.startsWith("00D30000000JVcvEAG/")
+    !connectionId.includes(req.session.id)
   )
-    return res.status(401).send("wrong connection");
+    return res.status(401).send("unauthorized");
   let id;
   let error;
   for await (const k of storage.list(path.join(connectionId, "__id/"))) {
