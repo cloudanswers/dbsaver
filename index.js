@@ -118,12 +118,9 @@ app.get(
       res.redirect(req.session["retURL"]);
       req.session.retURL = undefined; // clear after successful redirect
     } else {
-      res.send(
-        `<a href="/dashboard/salesforce/${connectionId}">/dashboard/salesforce/${connectionId}</a>`
-      );
+      const dashboardUrl = path.join("/dashboard/salesforce/", connectionId);
+      res.redirect(301, dashboardUrl);
     }
-    // else res.send(JSON.stringify(x) + ` <a href="/auth">try again</a>`);
-    // .catch((x) => res.status(400).send(`error ${x}`));
   }
 );
 
