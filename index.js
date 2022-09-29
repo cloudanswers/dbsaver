@@ -15,6 +15,7 @@ const app = express();
 app.use(helmet());
 app.set("view engine", "pug");
 app.set("trust proxy", 1); // trust first proxy which is heroku
+app.use("/static", express.static("public"));
 app.use(
   cookieSession({
     // name: "session",
