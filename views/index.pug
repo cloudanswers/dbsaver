@@ -1,8 +1,59 @@
 extends layout.pug
-
+block nav
+    //- hide the nav on login screen
 block content 
-    div.container.pt-5
-        section.nes-container.with-title
-            h3.title login here
-            a(href="/auth") click here to login with salesforce
-        
+    <div class="container-fluid" style="height: 100%;">
+        <div class="row align-items-center" style="height: 100%;">
+            <div class="col" style="height: 100%; display: table-cell; margin: auto;  padding: 5%;">
+            //- div.alert.alert-danger TODO error message
+            <div style="width: 100%; max-width: 500px; margin: 0 auto; border-radius: 5px; background-color: white;padding: 2.5em;text-align: center; padding-bottom: 15px;">
+
+                //- TODO: insert our logo
+                img(src="/static/logo.png" style="max-width: 100%")
+                
+                a.btn.btn-primary.btn-lg(href="/auth") Sign in with Salesforce 
+                
+                br
+                br
+
+                <div style="color: grey;font-size: small;margin-top: 20px;">
+                    | Your login is only used to backup data, no data will be modified and no applications will be installed.  You can revoke access when you want to remove access.
+                </div>
+                hr(style="margin-top: 60px;")
+                <p style="color: grey;font-size: smaller;">
+                    | By signing in, you agree to our 
+                    <a href="https://www.cloudanswers.com/legal" target="_blank">Terms of Service</a> and
+                    <a href="https://www.cloudanswers.com/legal" target="_blank">Privacy Policy</a>.
+                </p>
+                <hr style="margin-top: 60px;">
+                <p style="color: #3f4652;font-size: 16px; display:inline">Not ready to sign up? </p>
+                <a href="https://www.dbsaver.com" class="btn btn-primary btn-lg" style="background-color: white; color:black; margin-left: 10px; border-width:3px; border-color: #337ab7;">
+                    | learn more
+                </a>
+            </div>
+            </div>
+            <div class="col" style="background: #ebebeb; height: 100%; display: table-cell; margin: auto;  padding: 5%;" align="center">
+                //- TODO: put a cool graphic here
+                //- <img />
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <h3 style="color: #00c3ef; margin-top: 40px;">Login with Salesforce to create a <u>free</u> account</h3>
+                                <ul style="padding-top: 10px;">
+                                    <li style="margin-bottom: 5px; padding-left: 1em;">Generous free tier of data storage</li>
+                                    <li style="margin-bottom: 5px; padding-left: 1em;">View daily changes to records</li>
+                                    <li style="margin-bottom: 5px; padding-left: 1em;">Metadata history to track deployments</li>
+                                    <li style="margin-bottom: 5px; padding-left: 1em;">Login history archival for compliance</li>
+                                    <li style="margin-bottom: 5px; padding-left: 1em;">We will never spam you</li>
+                                </ul>
+                                <p style="padding-top: 10px;">Visit <a href="https://www.dbsaver.com/" style="color: #333"><u>www.dbsaver.com</u></a> for more info, including pricing, for our source code, 
+                                and to read about upcoming releases.
+                                </p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
