@@ -172,10 +172,19 @@ app.get("/dashboard/*", async (req, res) => {
 
 app.get("/", (req, res) => res.render("index"));
 
-app.use("/api", api);
+// plausible analytics
+app.use(
+  proxy("https://plausible.io", {
+    filter: function (req, res) {
+      console.log(req.method, req.path);
+      if (req.path == "/js/script.js") return true;
+      if (req.path == "/js/plausible.js") return true;
+      if (req.path == "/api/event") return true;
+    },
+  })
+);
 
-// everything else routes to old app
-// app.use("/", proxy("oldserver"));
+app.use("/api", api);
 
 const PORT = settings.PORT || 3000;
 
