@@ -3,12 +3,15 @@ const debug = require("debug")("storage");
 const settings = require("./settings");
 const zlib = require("zlib");
 
-const s3 = new AWS.S3({
-  endpoint: new AWS.Endpoint(settings.AWS_ENDPOINT),
+const s3opts = {
   accessKeyId: settings.AWS_ACCESS_KEY_ID,
   secretAccessKey: settings.AWS_SECRET_ACCESS_KEY,
   signatureVersion: "v4",
-});
+};
+if (settings.AWS_ENDPOINT) {
+  s3opts.endpoint = new AWS.Endpoint(settings.AWS_ENDPOINT);
+}
+const s3 = new AWS.S3(s3opts);
 
 const bb = s3;
 
