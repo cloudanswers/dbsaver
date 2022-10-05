@@ -81,6 +81,14 @@ async function exists(key, backend = s3) {
     .catch(() => false);
 }
 
+async function getSignedUrl(key, backend = s3) {
+  var params = {
+    Bucket: backend == s3 ? settings.AWS_S3_BUCKET : settings.BB_S3_BUCKET,
+    Key: key,
+  };
+  return s3.getSignedUrlPromise("getObject", params);
+}
+
 async function get(key, backend = s3) {
   var res = await backend
     .getObject({
@@ -123,4 +131,5 @@ module.exports = {
   s3,
   bb,
   getJson,
+  getSignedUrl,
 };

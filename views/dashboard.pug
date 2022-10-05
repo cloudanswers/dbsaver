@@ -25,8 +25,12 @@ block content
         button.nes-btn.is-primary(type="button") Backup Metadata
 
     section
-        h3.title Folders 
-        pre=connectionId
+        h3.title Folder 
+        if connectionId != prefix
+          a(href="../") back
+          | &nbsp;
+        b #{prefix}
+        
         
         for f in folders
           section(class="topic")
@@ -48,9 +52,10 @@ block content
                 th(scope="row")=index
                 td=f
                 td
-                  a(href="/dashboard/" + f) open
-                  span.px-1 |
-                  a(href="/dashboard/" + f) download
+                  if f.endsWith('/')
+                    a(href="/dashboard/" + f) open
+                  else
+                    a(href="/dashboard/" + f + "?download=1") download
 
             
           
