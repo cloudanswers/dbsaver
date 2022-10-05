@@ -1,7 +1,9 @@
 const salesforce = require("./salesforce");
 const jsforce = require("jsforce");
 const storage = require("./storage");
+const { STREAM_DOWNLOAD_CONCURRENCY_LIMIT } = require("./settings");
 const path = require("path");
+const Bottleneck = require("bottleneck/es5");
 
 async function stream(prefix) {
   const pathPrefix = path.join(prefix, "__ChangeDataCapture/");
@@ -11,7 +13,12 @@ async function stream(prefix) {
   // must do one other api call before streaming works, not sure why:
   // await conn.query("select id from account limit 1").then(console.log);
   // await conn.identity().then(console.log);
-  console.log(await conn.limits());
+  console.log(prefix, "checking limits...");
+  try {
+    console.log(prefix, await conn.limits());
+  } catch (e) {
+    console.error(prefix, "error getting limits:", e);
+  }
 
   // The Salesforce streaming topic and position to start from.
   const channel = "/data/ChangeEvents";
@@ -21,7 +28,7 @@ async function stream(prefix) {
   let replayId = -2;
 
   for await (const key of storage.list(pathPrefix)) {
-    console.log({ key });
+    console.log(prefix, { key });
     // TODO could we just parse the key instead of getting the object
     let data = await storage.getJson(key);
     // console.log({ data });
@@ -39,15 +46,15 @@ async function stream(prefix) {
   const streamClient = conn.streaming.createClient([
     new jsforce.StreamingExtension.Replay(channel, replayId),
     new jsforce.StreamingExtension.AuthFailure((err) => {
-      console.error("StreamingExtension.AuthFailure:", err);
-      process.exit(1);
+      console.error(prefix, "StreamingExtension.AuthFailure:", err);
+      throw new Error(prefix + "StreamingExtension.AuthFailure:", err);
     }),
   ]);
   let lastEventTime = new Date().getTime();
   const subscription = streamClient.subscribe(channel, (data) => {
     console.log("topic received data", JSON.stringify(data));
     if (!data?.event?.replayId) {
-      throw new Error("missing replayId on data object");
+      throw new Error(prefix + "missing replayId on data object");
     }
 
     // a reversed key enables us to query only the top record in a folder to know the latest record
@@ -60,16 +67,20 @@ async function stream(prefix) {
       `${reversedId}__${data.event.replayId}`
     );
 
-    console.log({ outFile, reversedId });
+    console.log(prefix, { outFile, reversedId });
     storage.put(outFile, data);
     lastEventTime = new Date().getTime();
   });
+
   // cancel if no events in 30 seconds
   const intervalCancel = setInterval(() => {
     if (lastEventTime < new Date().getTime() - 30_000) {
-      console.log("cancelling streaming subscription due to no new events");
+      console.log(
+        prefix,
+        "cancelling streaming subscription due to no new events"
+      );
       subscription.cancel();
-      intervalCancel();
+      if (intervalCancel) clearInterval(intervalCancel);
     }
   }, 10_000);
 }
@@ -85,8 +96,14 @@ async function main(prefix = "salesforce/") {
       seen.push(userPrefix);
       if (userPrefix.split("/").filter((x) => x).length != 3) continue;
       console.log({ userPrefix });
-      promises.push(stream(userPrefix).catch(console.log));
+      promises.push(stream(userPrefix).catch(console.error));
     }
   }
   await Promise.all(promises);
+}
+
+if (require.main === module) {
+  main()
+    .then(() => console.log("all streams done"))
+    .catch(console.error);
 }
