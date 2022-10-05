@@ -165,8 +165,27 @@ app.get("/dashboard/*", async (req, res) => {
       error = e;
     }
   }
+
   let folders = [];
-  for await (const f of storage.list(prefix)) folders.push(f);
+  for await (const f of storage.list(prefix)) {
+    folders.push(f);
+  }
+
+  if (req.query.search) {
+    folders = folders.map(async (f) => {
+      try {
+        let x = await storage.get(f);
+        if (x && x.includes(req.query.search)) {
+          return f;
+        }
+      } catch (e) {
+        console.error(prefix, e);
+      }
+    });
+    folders = await Promise.all(folders);
+    folders = folders.filter((f) => !!f);
+  }
+
   res.render("dashboard", { connectionId, id, error, folders });
 });
 
