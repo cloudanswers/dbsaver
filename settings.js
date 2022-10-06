@@ -13,6 +13,8 @@ const {
   AWS_ENDPOINT,
 
   SESSION_SECRET,
+
+  STREAM_DOWNLOAD_CONCURRENCY_LIMIT,
 } = process.env;
 
 module.exports = {
@@ -28,4 +30,6 @@ module.exports = {
   AWS_ENDPOINT,
 
   SESSION_SECRET,
+
+  STREAM_DOWNLOAD_CONCURRENCY_LIMIT,
 };

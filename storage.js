@@ -3,12 +3,15 @@ const debug = require("debug")("storage");
 const settings = require("./settings");
 const zlib = require("zlib");
 
-const s3 = new AWS.S3({
-  endpoint: new AWS.Endpoint(settings.AWS_ENDPOINT),
+const s3opts = {
   accessKeyId: settings.AWS_ACCESS_KEY_ID,
   secretAccessKey: settings.AWS_SECRET_ACCESS_KEY,
   signatureVersion: "v4",
-});
+};
+if (settings.AWS_ENDPOINT) {
+  s3opts.endpoint = new AWS.Endpoint(settings.AWS_ENDPOINT);
+}
+const s3 = new AWS.S3(s3opts);
 
 const bb = s3;
 
@@ -78,6 +81,14 @@ async function exists(key, backend = s3) {
     .catch(() => false);
 }
 
+async function getSignedUrl(key, backend = s3) {
+  var params = {
+    Bucket: backend == s3 ? settings.AWS_S3_BUCKET : settings.BB_S3_BUCKET,
+    Key: key,
+  };
+  return s3.getSignedUrlPromise("getObject", params);
+}
+
 async function get(key, backend = s3) {
   var res = await backend
     .getObject({
@@ -120,4 +131,5 @@ module.exports = {
   s3,
   bb,
   getJson,
+  getSignedUrl,
 };

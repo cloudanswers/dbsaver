@@ -165,9 +165,35 @@ app.get("/dashboard/*", async (req, res) => {
       error = e;
     }
   }
+
   let folders = [];
-  for await (const f of storage.list(prefix)) folders.push(f);
-  res.render("dashboard", { connectionId, id, error, folders });
+  for await (const f of storage.list(prefix)) {
+    folders.push(f);
+  }
+
+  // hide the auth folder from regular users
+  folders = folders.filter((f) => !f.endsWith("__auth/"));
+
+  if (folders.length === 1 && req.query.download) {
+    return res.redirect(await storage.getSignedUrl(prefix));
+  }
+
+  if (req.query.search) {
+    folders = folders.map(async (f) => {
+      try {
+        let x = await storage.get(f);
+        if (x && x.includes(req.query.search)) {
+          return f;
+        }
+      } catch (e) {
+        console.error(prefix, e);
+      }
+    });
+    folders = await Promise.all(folders);
+    folders = folders.filter((f) => !!f);
+  }
+
+  res.render("dashboard", { prefix, connectionId, id, error, folders });
 });
 
 app.get("/", (req, res) => res.render("index"));
